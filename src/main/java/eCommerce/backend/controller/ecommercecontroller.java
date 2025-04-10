@@ -1,6 +1,16 @@
 package eCommerce.backend.controller;
 
+import eCommerce.backend.DTO.OrderRequest;
+import eCommerce.backend.DTO.OrderResponse;
+import eCommerce.backend.DTO.ProductRequest;
+import eCommerce.backend.DTO.ProductResponse;
+import eCommerce.backend.entities.Category;
+import eCommerce.backend.entities.Order;
+import eCommerce.backend.entities.Product;
 import eCommerce.backend.entities.user;
+import eCommerce.backend.repository.OrderRepository;
+import eCommerce.backend.repository.ProductRepository;
+import eCommerce.backend.repository.categoryRepository;
 import eCommerce.backend.repository.userRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +25,15 @@ public class ecommercecontroller {
 
     @Autowired
     private userRepository userRepository;
+
+    @Autowired
+    private categoryRepository categoryRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     // User Registration
     @PostMapping("/register")
@@ -62,5 +81,112 @@ public class ecommercecontroller {
         return ResponseEntity.ok("Login successful");
     }
 
+    @PostMapping("/category")
+    public ResponseEntity<?> categoryRegister(@RequestBody Category category){
+
+        try {
+            Category savedCategory = categoryRepository.save(category);
+
+            if (savedCategory.getId() > 0) {
+                return ResponseEntity.ok("Category  registered successfully!");
+            } else {
+                return ResponseEntity.status(500).body("Registration failed: Could not save Category.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Something went wrong during registration.");
+        }
+    }
+    @PostMapping("/product")
+    public ResponseEntity<?> createProduct(@RequestBody ProductRequest request) {
+        try {
+            // Fetch category by ID
+            System.out.println("Prd "+ request);
+            Category category = categoryRepository.findCategoryByIdNative(request.getCategoryId());
+            if (category == null) {
+                return ResponseEntity.status(404).body("Category not found.");
+            }
+
+            if (category == null) {
+                return ResponseEntity.status(404).body("Category not found.");
+            }
+
+            // Create and save new product
+            Product product = new Product();
+            product.setName(request.getName());
+            product.setCategory(category);
+
+            productRepository.save(product);
+            return ResponseEntity.ok("Product added successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error while saving product.");
+        }
+    }
+
+    @GetMapping("/categories")
+    public ResponseEntity<List<Category>> getAllCategories() {
+        List<Category> categories = categoryRepository.findAll();
+        return ResponseEntity.ok(categories);
+    }
+
+    @GetMapping("/products")
+    public ResponseEntity<List<ProductResponse>> getAllProducts() {
+        List<Product> products = productRepository.findAll();
+
+        List<ProductResponse> response = products.stream().map(product ->
+                new ProductResponse(
+                        product.getId(),
+                        product.getName(),
+                        product.getCategory().getId(),
+                        product.getCategory().getName()
+                )
+        ).toList();
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    @PostMapping("/order")
+    public ResponseEntity<?> placeOrder(@RequestBody OrderRequest orderRequest) {
+        try {
+            // Fetch user by ID
+            user userEntity = userRepository.findById(orderRequest.getUserId()).orElse(null);
+            if (userEntity == null) {
+                return ResponseEntity.status(404).body("User not found.");
+            }
+
+            // Fetch product by ID
+            Product product = productRepository.findById(orderRequest.getProductId()).orElse(null);
+            if (product == null) {
+                return ResponseEntity.status(404).body("Product not found.");
+            }
+
+            // Create and save order
+            Order order = new Order();
+            order.setUser(userEntity);
+            order.setProduct(product);
+            orderRepository.save(order);
+
+            return ResponseEntity.ok("Order placed successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error placing order.");
+        }
+    }
+
+    @GetMapping("/orders")
+    public ResponseEntity<List<OrderResponse>> getAllOrders() {
+        List<Order> orders = orderRepository.findAll();
+
+        List<OrderResponse> response = orders.stream().map(order ->
+                new OrderResponse(
+                        order.getId(),
+                        order.getUser().getId(),
+                        order.getUser().getName(),
+                        order.getProduct().getId(),
+                        order.getProduct().getName()
+                )
+        ).toList();
+
+        return ResponseEntity.ok(response);
+    }
 
 }
