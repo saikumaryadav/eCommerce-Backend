@@ -1,17 +1,8 @@
 package eCommerce.backend.controller;
 
-import eCommerce.backend.DTO.OrderRequest;
-import eCommerce.backend.DTO.OrderResponse;
-import eCommerce.backend.DTO.ProductRequest;
-import eCommerce.backend.DTO.ProductResponse;
-import eCommerce.backend.entities.Category;
-import eCommerce.backend.entities.Order;
-import eCommerce.backend.entities.Product;
-import eCommerce.backend.entities.user;
-import eCommerce.backend.repository.OrderRepository;
-import eCommerce.backend.repository.ProductRepository;
-import eCommerce.backend.repository.categoryRepository;
-import eCommerce.backend.repository.userRepository;
+import eCommerce.backend.DTO.*;
+import eCommerce.backend.entities.*;
+import eCommerce.backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +25,9 @@ public class ecommercecontroller {
 
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private CartRepository cartRepository;
 
     // User Registration
     @PostMapping("/register")
@@ -209,5 +203,70 @@ public class ecommercecontroller {
 
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/cart")
+    public ResponseEntity<?> addToCart(@RequestBody CartRequest cartRequestDTO) {
+        // Fetch entities
+        user userEntity = userRepository.findById(cartRequestDTO.getUserId()).orElse(null);
+        Category categoryEntity = categoryRepository.findById(cartRequestDTO.getCategoryId()).orElse(null);
+        Product productEntity = productRepository.findById(cartRequestDTO.getProductId()).orElse(null);
+
+        if (userEntity == null || categoryEntity == null || productEntity == null) {
+            return ResponseEntity.badRequest().body("Invalid user, category, or product ID");
+        }
+
+        // Create Cart entity
+        Cart cart = new Cart();
+        cart.setUser(userEntity);
+        cart.setCategory(categoryEntity);
+        cart.setProduct(productEntity);
+        cart.setAmount(cartRequestDTO.getAmount());
+
+        // Save to DB
+        Cart savedCart = cartRepository.save(cart);
+
+        // Prepare response DTO
+        CartResponse response = new CartResponse(
+                savedCart.getId(),
+                userEntity.getId(),
+                userEntity.getName(),
+                productEntity.getId(),
+                productEntity.getName(),
+                categoryEntity.getId(),
+                categoryEntity.getName(),
+                savedCart.getAmount()
+        );
+
+        return ResponseEntity.ok("Item added to cart successfully");
+    }
+
+    @GetMapping("/cart/{userId}")
+    public ResponseEntity<?> getCartByUserId(@PathVariable int userId) {
+        user userEntity = userRepository.findById(userId).orElse(null);
+
+        if (userEntity == null) {
+            return ResponseEntity.status(404).body("User not found");
+        }
+
+        List<Cart> cartList = cartRepository.findByUser(userEntity);
+
+        if (cartList.isEmpty()) {
+            return ResponseEntity.ok("Cart is empty for user ID: " + userId);
+        }
+
+        List<CartResponse> responseList = cartList.stream().map(cart -> new CartResponse(
+                cart.getId(),
+                cart.getUser().getId(),
+                cart.getUser().getName(),
+                cart.getProduct().getId(),
+                cart.getProduct().getName(),
+                cart.getCategory().getId(),
+                cart.getCategory().getName(),
+                cart.getAmount()
+        )).toList();
+
+        return ResponseEntity.ok(responseList);
+    }
+
 
 }
