@@ -96,6 +96,21 @@ public class ecommercecontroller {
             return ResponseEntity.status(500).body("Something went wrong during registration.");
         }
     }
+
+    @GetMapping("/catwiseproducts/{id}")
+    public ResponseEntity<?> productsByCategory(@PathVariable int id){
+        List<Product> products = productRepository.findProductsByCategoryId(id);
+        //List<Produ>
+        for(Product product : products){
+
+        }
+
+        if (products.isEmpty()) {
+            return ResponseEntity.status(404).body("No products found for category ID: " + id);
+        } else {
+            return ResponseEntity.ok(products);
+        }
+    }
     @PostMapping("/product")
     public ResponseEntity<?> createProduct(@RequestBody ProductRequest request) {
         try {
@@ -114,6 +129,9 @@ public class ecommercecontroller {
             Product product = new Product();
             product.setName(request.getName());
             product.setCategory(category);
+            product.setAmount(request.getAmount());
+            product.setStock(request.getStock());
+            product.setDescription(request.getDescription());
 
             productRepository.save(product);
             return ResponseEntity.ok("Product added successfully.");
@@ -137,7 +155,10 @@ public class ecommercecontroller {
                         product.getId(),
                         product.getName(),
                         product.getCategory().getId(),
-                        product.getCategory().getName()
+                        product.getCategory().getName(),
+                        product.getStock(),
+                        product.getAmount(),
+                        product.getDescription()
                 )
         ).toList();
 

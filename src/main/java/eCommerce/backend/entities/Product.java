@@ -17,6 +17,13 @@ public class Product {
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     private Category category;
 
+    private int stock;
+
+    private double amount;
+
+    private String description;
+
+
     // Constructors
     public Product() {
     }
@@ -50,4 +57,29 @@ public class Product {
     public void setCategory(Category category) {
         this.category = category;
     }
+
+    public int getStock() {
+        return stock;
+    }
+
+    public void setStock(int stock) {
+        this.stock = stock;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
 }
