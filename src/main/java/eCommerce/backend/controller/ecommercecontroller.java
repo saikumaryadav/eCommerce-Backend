@@ -175,13 +175,22 @@ public class ecommercecontroller {
                 return ResponseEntity.status(404).body("Product not found.");
             }
 
+            // Check if stock is available
+            if (product.getStock() <= 0) {
+                return ResponseEntity.status(400).body("Product is out of stock.");
+            }
+
+            // Decrease stock by 1
+            product.setStock(product.getStock() - 1);
+            productRepository.save(product);
+
             // Create and save order
             Order order = new Order();
             order.setUser(userEntity);
             order.setProduct(product);
             orderRepository.save(order);
 
-            return ResponseEntity.ok("Order placed successfully.");
+            return ResponseEntity.ok("Order placed successfully and stock updated.");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error placing order.");
         }
