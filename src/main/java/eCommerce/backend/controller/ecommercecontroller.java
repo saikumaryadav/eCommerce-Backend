@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -31,17 +33,32 @@ public class ecommercecontroller {
 
     // User Registration
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody user newUser) {
+    public ResponseEntity<Map<String, Object>> registerUser(@RequestBody user newUser) {
         try {
+            user existingUser = userRepository.findByEmail(newUser.getEmail());
+            if (existingUser != null) {
+                Map<String, Object> response = new HashMap<>();
+                response.put("message", "Email already exists");
+                return ResponseEntity.status(400).body(response);
+            }
+
             user savedUser = userRepository.save(newUser);
 
             if (savedUser.getId() > 0) {
-                return ResponseEntity.ok("User registered successfully!");
+                Map<String, Object> response = new HashMap<>();
+                response.put("userId", savedUser.getId());
+                response.put("username", savedUser.getName());
+                response.put("message", "User registered successfully!");
+                return ResponseEntity.ok(response);
             } else {
-                return ResponseEntity.status(500).body("Registration failed: Could not save user.");
+                Map<String, Object> response = new HashMap<>();
+                response.put("message", "Registration failed: Could not save user.");
+                return ResponseEntity.status(500).body(response);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("Something went wrong during registration.");
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Something went wrong during registration.");
+            return ResponseEntity.status(500).body(response);
         }
     }
 
@@ -61,18 +78,26 @@ public class ecommercecontroller {
     }
     // Login
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody user loginRequest) {
+    public ResponseEntity<Map<String, Object>> loginUser(@RequestBody user loginRequest) {
         user existingUser = userRepository.findByEmail(loginRequest.getEmail());
 
         if (existingUser == null) {
-            return ResponseEntity.status(404).body("User not found");
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "User not found");
+            return ResponseEntity.status(404).body(response);
         }
 
         if (!existingUser.getPassword().equals(loginRequest.getPassword())) {
-            return ResponseEntity.status(401).body("Invalid password");
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Invalid password");
+            return ResponseEntity.status(401).body(response);
         }
 
-        return ResponseEntity.ok("Login successful");
+        Map<String, Object> response = new HashMap<>();
+        response.put("userId", existingUser.getId());
+        response.put("username", existingUser.getName());
+        response.put("message", "Login successful");
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/category")
@@ -216,9 +241,13 @@ public class ecommercecontroller {
     @PostMapping("/cart")
     public ResponseEntity<?> addToCart(@RequestBody CartRequest cartRequestDTO) {
         // Fetch entities
+        System.out.println("Received cart request: " + cartRequestDTO);
         user userEntity = userRepository.findById(cartRequestDTO.getUserId()).orElse(null);
+        System.out.println("User: " + userEntity);
         Category categoryEntity = categoryRepository.findById(cartRequestDTO.getCategoryId()).orElse(null);
+        System.out.println("Category: " + categoryEntity);
         Product productEntity = productRepository.findById(cartRequestDTO.getProductId()).orElse(null);
+        System.out.println("Product: " + productEntity);
 
         if (userEntity == null || categoryEntity == null || productEntity == null) {
             return ResponseEntity.badRequest().body("Invalid user, category, or product ID");
@@ -262,7 +291,8 @@ public class ecommercecontroller {
         if (cartList.isEmpty()) {
             return ResponseEntity.ok("Cart is empty for user ID: " + userId);
         }
-
+        System.out.println("cart"+cartList);
+        for (Cart cart : cartList) {System.out.println(cart);}
         List<CartResponse> responseList = cartList.stream().map(cart -> new CartResponse(
                 cart.getId(),
                 cart.getUser().getId(),
