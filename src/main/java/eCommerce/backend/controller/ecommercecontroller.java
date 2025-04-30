@@ -318,5 +318,32 @@ public class ecommercecontroller {
         return ResponseEntity.ok("Item removed from cart successfully.");
     }
 
+    @GetMapping("/orders/{userId}")
+    public ResponseEntity<?> getOrdersByUserId(@PathVariable int userId) {
+        Optional<user> userOptional = userRepository.findById(userId);
+
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(404).body("User not found");
+        }
+
+        List<Order> userOrders = orderRepository.findByUserOrderByIdDesc(userOptional.get());
+
+        if (userOrders.isEmpty()) {
+            return ResponseEntity.ok("No orders found for user ID: " + userId);
+        }
+
+        List<OrderResponse> response = userOrders.stream().map(order ->
+                new OrderResponse(
+                        order.getId(),
+                        order.getUser().getId(),
+                        order.getUser().getName(),
+                        order.getProduct().getId(),
+                        order.getProduct().getName()
+                )
+        ).toList();
+
+        return ResponseEntity.ok(response);
+    }
+
 
 }
