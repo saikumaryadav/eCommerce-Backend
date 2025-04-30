@@ -306,6 +306,17 @@ public class ecommercecontroller {
 
         return ResponseEntity.ok(responseList);
     }
+    @DeleteMapping("/cart/{cartId}")
+    public ResponseEntity<String> removeFromCart(@PathVariable int cartId) {
+        Optional<Cart> cartOptional = cartRepository.findById(cartId);
+
+        if (cartOptional.isEmpty()) {
+            return ResponseEntity.status(404).body("Cart item not found.");
+        }
+
+        cartRepository.deleteById(cartId);
+        return ResponseEntity.ok("Item removed from cart successfully.");
+    }
 
 
 }
