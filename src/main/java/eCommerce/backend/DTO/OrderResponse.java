@@ -6,13 +6,15 @@ public class OrderResponse {
     private String userName;
     private int productId;
     private String productName;
+    private String address;
 
-    public OrderResponse(int orderId, int userId, String userName, int productId, String productName) {
+    public OrderResponse(int orderId, int userId, String userName, int productId, String productName, String address) {
         this.orderId = orderId;
         this.userId = userId;
         this.userName = userName;
         this.productId = productId;
         this.productName = productName;
+        this.address =address;
     }
 
     // Getters
@@ -34,5 +36,13 @@ public class OrderResponse {
 
     public String getProductName() {
         return productName;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

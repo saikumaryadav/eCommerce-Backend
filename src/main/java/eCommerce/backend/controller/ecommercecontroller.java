@@ -213,6 +213,7 @@ public class ecommercecontroller {
             Order order = new Order();
             order.setUser(userEntity);
             order.setProduct(product);
+            order.setAddress(orderRequest.getAddress());
             orderRepository.save(order);
 
             return ResponseEntity.ok("Order placed successfully and stock updated.");
@@ -231,7 +232,8 @@ public class ecommercecontroller {
                         order.getUser().getId(),
                         order.getUser().getName(),
                         order.getProduct().getId(),
-                        order.getProduct().getName()
+                        order.getProduct().getName(),
+                        order.getAddress()
                 )
         ).toList();
 
@@ -341,7 +343,8 @@ public class ecommercecontroller {
                         order.getUser().getId(),
                         order.getUser().getName(),
                         order.getProduct().getId(),
-                        order.getProduct().getName()
+                        order.getProduct().getName(),
+                        order.getAddress()
                 )
         ).toList();
 

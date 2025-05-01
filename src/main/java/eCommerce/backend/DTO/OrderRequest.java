@@ -4,6 +4,8 @@ public class OrderRequest {
     private int userId;
     private int productId;
 
+    private String address;
+
     public int getUserId() {
         return userId;
     }
@@ -18,5 +20,13 @@ public class OrderRequest {
 
     public void setProductId(int productId) {
         this.productId = productId;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

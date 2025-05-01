@@ -18,7 +18,7 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private user user;
-
+    private String address;
     // Constructors
     public Order() {}
 
@@ -50,5 +50,13 @@ public class Order {
 
     public void setUser(user user) {
         this.user = user;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }
