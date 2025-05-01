@@ -259,6 +259,7 @@ public class ecommercecontroller {
         cart.setCategory(categoryEntity);
         cart.setProduct(productEntity);
         cart.setAmount(cartRequestDTO.getAmount());
+        cart.setAddress(cartRequestDTO.getAddress());
 
         // Save to DB
         Cart savedCart = cartRepository.save(cart);
@@ -272,7 +273,8 @@ public class ecommercecontroller {
                 productEntity.getName(),
                 categoryEntity.getId(),
                 categoryEntity.getName(),
-                savedCart.getAmount()
+                savedCart.getAmount(),
+                savedCart.getAddress()
         );
 
         return ResponseEntity.ok("Item added to cart successfully");
@@ -301,7 +303,8 @@ public class ecommercecontroller {
                 cart.getProduct().getName(),
                 cart.getCategory().getId(),
                 cart.getCategory().getName(),
-                cart.getAmount()
+                cart.getAmount(),
+                cart.getAddress()
         )).toList();
 
         return ResponseEntity.ok(responseList);

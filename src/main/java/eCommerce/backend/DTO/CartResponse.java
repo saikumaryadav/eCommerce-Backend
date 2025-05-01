@@ -10,12 +10,15 @@ public class CartResponse {
     private String categoryName;
     private double amount;
 
+    private String address;
+
+
     // Constructors
     public CartResponse() {
     }
 
     public CartResponse(int cartId, int userId, String userName, int productId, String productName,
-                           int categoryId, String categoryName, double amount) {
+                           int categoryId, String categoryName, double amount, String address) {
         this.cartId = cartId;
         this.userId = userId;
         this.userName = userName;
@@ -24,6 +27,7 @@ public class CartResponse {
         this.categoryId = categoryId;
         this.categoryName = categoryName;
         this.amount = amount;
+        this.address = address;
     }
 
     // Getters and Setters
@@ -90,5 +94,13 @@ public class CartResponse {
 
     public void setAmount(double amount) {
         this.amount = amount;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }
