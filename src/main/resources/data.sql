@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS orders (
 );
 
 -- Insert sample data into user
-INSERT INTO user (name, email, password) VALUES 
+INSERT INTO user (name, email, password) VALUES
 ('Dharma', 'dharma@gmail.com', '12345'),
 ('Alice', 'alice@gmail.com', '12345'),
 ('Bob', 'bob@gmail.com', '12345');
@@ -104,7 +104,8 @@ INSERT INTO product (amount, description, name, stock, category_id) VALUES
 (3.49, 'Orange juice (1L)', 'Orange Juice', 70, 3),
 (8.99, 'Almonds (500g)', 'Almonds', 40, 3),
 (1.99, 'Instant coffee (200g)', 'Coffee', 200, 3),
-(4.49, 'Pasta (500g)', 'Pasta', 110, 3);
+(4.49, 'Pasta (500g)', 'Pasta', 110, 3),
+(4.49, 'Pasta (500g)', 'SKyyy', 110, 3);
 
 -- Insert sample data into cart
 INSERT INTO cart (amount, category_id, product_id, user_id, quantity, address) VALUES 
